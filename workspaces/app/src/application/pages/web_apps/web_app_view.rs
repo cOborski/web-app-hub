@@ -87,9 +87,6 @@ impl WebAppView {
         let title = desktop_file_borrow
             .get_name()
             .unwrap_or(t!("web_apps.web_app_view.new_app.title").to_string());
-        let browser_can_isolate = desktop_file_borrow
-            .get_browser()
-            .is_some_and(|browser| browser.can_isolate);
         let browser_can_maximize = desktop_file_borrow
             .get_browser()
             .is_some_and(|browser| browser.can_start_maximized);
@@ -110,7 +107,7 @@ impl WebAppView {
         let delete_button = Self::build_delete_button();
         let name_row = Self::build_name_row(desktop_file);
         let url_row = Self::build_url_row(desktop_file);
-        let isolate_row = Self::build_isolate_row(desktop_file, browser_can_isolate);
+        let isolate_row = Self::build_isolate_row(desktop_file);
         let maximize_row = Self::build_maximize_row(desktop_file, browser_can_maximize);
         let browser_row = Self::build_browser_row(app, desktop_file, is_new);
         let optional_row = Self::build_optional_row();
@@ -338,11 +335,10 @@ impl WebAppView {
             .build()
     }
 
-    fn build_isolate_row(
-        desktop_file: &Rc<RefCell<DesktopFile>>,
-        browser_can_isolate: bool,
-    ) -> SwitchRow {
+    fn build_isolate_row(desktop_file: &Rc<RefCell<DesktopFile>>) -> SwitchRow {
         let mut desktop_file_borrow = desktop_file.borrow_mut();
+        let browser = desktop_file_borrow.get_browser();
+        let browser_can_isolate = browser.as_ref().is_some_and(|browser| browser.can_isolate);
         let has_isolated = desktop_file_borrow.get_isolated();
         let is_isolated = has_isolated.unwrap_or(false);
 
@@ -355,7 +351,10 @@ impl WebAppView {
             .has_tooltip(!browser_can_isolate)
             .build();
 
-        if !browser_can_isolate && is_isolated {
+        if let Some(browser) = browser
+            && !browser.can_isolate
+            && is_isolated
+        {
             debug!("Found desktop file with isolate on a browser that is incapable");
             switch_row.set_active(false);
         }
@@ -908,17 +907,18 @@ impl WebAppView {
     }
 
     fn reset_browser_isolation(self: &Rc<Self>) {
-        let browser_can_isolate = self
-            .desktop_file
-            .borrow()
-            .get_browser()
-            .is_some_and(|browser| browser.can_isolate);
+        let browser = self.desktop_file.borrow().get_browser();
+        let browser_can_isolate = browser.as_ref().is_some_and(|browser| browser.can_isolate);
+
         self.isolate_row.set_sensitive(browser_can_isolate);
+
         if browser_can_isolate {
             self.isolate_row.set_has_tooltip(false);
         } else {
-            self.isolate_row.set_active(false);
             self.isolate_row.set_has_tooltip(true);
+        }
+        if browser.is_some() && !browser_can_isolate {
+            self.isolate_row.set_active(false);
         }
     }
 
