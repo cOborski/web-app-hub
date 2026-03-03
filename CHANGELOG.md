@@ -1,3 +1,17 @@
+## [0.9.0] - 2026-03-03
+
+### 🚀 Features
+
+- *(browsers)* Add more alternative system binary names
+
+### 🚜 Refactor
+
+- *(browsers)* Try to find the right system browser instead of listing multiple
+- *(web-app-view)* Don't disable isolation if browser is not found
+
+### ⚙️ Miscellaneous Tasks
+
+- *(browsers)* Update yaml config name
 ## [0.8.0] - 2026-02-28
 
 ### 🚀 Features
@@ -15,6 +29,10 @@
 ### 📚 Documentation
 
 - *(readme)* Add array info to browser config
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* V0.8.0
 ## [0.7.0] - 2026-02-19
 
 ### 🚀 Features
@@ -111,12 +129,3 @@
 - *(about)* Add language to credits
 - *(translations)* Add web app category
 - *(release)* V0.5.0
-## [0.4.1] - 2026-02-01
-
-### 🐛 Bug Fixes
-
-- *(desktop-file)* Web apps update again on app update
-
-### ⚙️ Miscellaneous Tasks
-
-- *(release)* V0.4.1
